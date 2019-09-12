@@ -40,15 +40,15 @@ class AbstractChart extends Component {
   }
 
   renderHorizontalLines = config => {
-    const {count, width, height, paddingTop, paddingRight} = config
+    const {count, width, height, paddingTop, paddingRight, chartHeight} = config
     return [...new Array(count)].map((_, i) => {
       return (
         <Line
           key={Math.random()}
           x1={paddingRight}
-          y1={(height / 4) * i + paddingTop}
+          y1={(chartHeight / 4) * i + paddingTop}
           x2={width}
-          y2={(height / 4) * i + paddingTop}
+          y2={(chartHeight / 4) * i + paddingTop}
           stroke={this.props.chartConfig.color(0.2)}
           strokeDasharray="5, 10"
           strokeWidth={1}
@@ -78,6 +78,7 @@ class AbstractChart extends Component {
       count,
       data,
       height,
+      chartHeight,
       paddingTop,
       paddingRight,
       yLabelsOffset = 12
@@ -97,14 +98,14 @@ class AbstractChart extends Component {
         yLabel = `${yAxisLabel}${label.toFixed(decimalPlaces)}`
       }
 
+      const spaceBetweenYLabels = chartHeight / count;
       return (
         <Text
           key={Math.random()}
           x={paddingRight - yLabelsOffset}
           textAnchor="end"
-          y={(height * 3) / 4 - ((height - paddingTop) / count) * i + 12}
-          fontSize={12}
-          fill={this.props.chartConfig.color(0.5)}
+          y={spaceBetweenYLabels * (count - i - 1) + paddingTop}
+          style={this.props.style.textStyle}
         >
           {yLabel}
         </Text>
@@ -117,12 +118,13 @@ class AbstractChart extends Component {
       labels = [],
       width,
       height,
+      chartHeight,
       paddingRight,
       paddingTop,
       horizontalOffset = 0,
       stackedBar = false
     } = config
-    const fontSize = 12
+    const fontSize = this.props.style.textStyle.fontSize || 12;
     let fac = 1
     if (stackedBar) {
       fac = 0.71
@@ -138,9 +140,8 @@ class AbstractChart extends Component {
               horizontalOffset) *
             fac
           }
-          y={(height * 3) / 4 + paddingTop + fontSize * 2}
-          fontSize={fontSize}
-          fill={this.props.chartConfig.color(0.5)}
+          y={(chartHeight * 3) / 4 + paddingTop + fontSize * 2}
+          style={this.props.style.textStyle}
           textAnchor="middle"
         >
           {label}

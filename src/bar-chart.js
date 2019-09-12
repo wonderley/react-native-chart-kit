@@ -1,16 +1,16 @@
 import React from 'react'
 import {View} from 'react-native'
-import {Svg, Rect, G} from 'react-native-svg'
+import {Svg, Rect, G, Text} from 'react-native-svg'
 import AbstractChart from './abstract-chart'
 
 const barWidth = 32
 
 class BarChart extends AbstractChart {
   renderBars = config => {
-    const {data, width, height, paddingTop, paddingRight} = config
-    const baseHeight = this.calcBaseHeight(data, height)
+    const {data, width, height, paddingTop, paddingRight, chartHeight} = config
+    const baseHeight = this.calcBaseHeight(data, chartHeight)
     return data.map((x, i) => {
-      const barHeight = this.calcHeight(x, data, height)
+      const barHeight = this.calcHeight(x, data, chartHeight)
       const barWidth = 32
       return (
         <Rect
@@ -33,10 +33,10 @@ class BarChart extends AbstractChart {
   }
 
   renderBarTops = config => {
-    const {data, width, height, paddingTop, paddingRight} = config
-    const baseHeight = this.calcBaseHeight(data, height)
+    const {data, width, height, paddingTop, paddingRight, chartHeight} = config
+    const baseHeight = this.calcBaseHeight(data, chartHeight)
     return data.map((x, i) => {
-      const barHeight = this.calcHeight(x, data, height)
+      const barHeight = this.calcHeight(x, data, chartHeight)
       return (
         <Rect
           key={Math.random()}
@@ -56,7 +56,7 @@ class BarChart extends AbstractChart {
 
   render() {
     const paddingTop = 16
-    const paddingRight = 64
+    const paddingRight = 80
     const { 
       width,
       height,
@@ -64,11 +64,17 @@ class BarChart extends AbstractChart {
       style = {},
       withHorizontalLabels = true,
       withVerticalLabels = true,
+      yLabelsOffset = 12,
     } = this.props
     const {borderRadius = 0} = style
+    // Two horizontal boxes take up some space which isn't included in the chart height.
+    const yTitleAreaHeight = 50;
+    const xTitleAreaHeight = 50;
+    const chartHeight = height - yTitleAreaHeight - xTitleAreaHeight;
     const config = {
       width,
-      height
+      height,
+      chartHeight,
     }
     return (
       <View style={style}>
@@ -85,13 +91,35 @@ class BarChart extends AbstractChart {
             fill="url(#backgroundGradient)"
           />
           <G>
+            <Text
+              key={Math.random()}
+              x={paddingRight}
+              textAnchor="end"
+              y={paddingTop + 10}
+              width="100%"
+              style={this.props.style.textStyle}
+            >
+              Distance
+            </Text>
+            <Text
+              key={Math.random()}
+              x={paddingRight}
+              textAnchor="end"
+              y={paddingTop + 30}
+              width="100%"
+              style={this.props.style.textStyle}
+            >
+              (Miles)
+            </Text>
+          </G>
+          <G y={yTitleAreaHeight}>
             {this.renderHorizontalLines({
               ...config,
               count: 4,
               paddingTop
             })}
           </G>
-          <G>
+          <G y={yTitleAreaHeight}>
             {withHorizontalLabels
               ? this.renderHorizontalLabels({
               ...config,
@@ -102,7 +130,7 @@ class BarChart extends AbstractChart {
             })
             : null}
           </G>
-          <G>
+          <G y={yTitleAreaHeight}>
             {withVerticalLabels
               ? this.renderVerticalLabels({
               ...config,
@@ -113,7 +141,7 @@ class BarChart extends AbstractChart {
             })
             : null}
           </G>
-          <G>
+          <G y={yTitleAreaHeight}>
             {this.renderBars({
               ...config,
               data: data.datasets[0].data,
@@ -121,7 +149,7 @@ class BarChart extends AbstractChart {
               paddingRight
             })}
           </G>
-          <G>
+          <G y={yTitleAreaHeight}>
             {this.renderBarTops({
               ...config,
               data: data.datasets[0].data,
@@ -129,6 +157,15 @@ class BarChart extends AbstractChart {
               paddingRight
             })}
           </G>
+          <Text
+              key={Math.random()}
+              x={width / 2}
+              y={yTitleAreaHeight + chartHeight + paddingTop + 20}
+              textAnchor="center"
+              style={this.props.style.textStyle}
+            >
+              Date
+            </Text>
         </Svg>
       </View>
     )
